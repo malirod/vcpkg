@@ -1,0 +1,61 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f69e9070..7e3813cf 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -170,11 +170,13 @@ if (COMPILER_HAS_W_NOEXCEPT_TYPE)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept-type")
+ endif()
+
+-if("${BUILD_TYPE_LOWER}" MATCHES "debug")
+-  message("debug mode was set")
+-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code")
+-else()
+-  message("release mode was set")
++if (NOT MSVC)
++  if("${BUILD_TYPE_LOWER}" MATCHES "debug")
++    message("debug mode was set")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unreachable-code")
++  else()
++    message("release mode was set")
++  endif()
+ endif()
+
+ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+@@ -191,6 +193,7 @@ find_package(Gflags REQUIRED)
+ find_package(Glog REQUIRED)
+
+ find_package(fmt CONFIG REQUIRED)
++find_package(ZLIB CONFIG REQUIRED)
+
+ include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
+
+@@ -320,7 +323,7 @@ target_include_directories(
+
+
+ target_link_libraries(ReactiveSocket
+-    PUBLIC yarpl glog::glog gflags
++    PUBLIC yarpl glog::glog gflags ZLIB::ZLIB
+     INTERFACE ${EXTRA_LINK_FLAGS})
+
+ target_compile_options(
+diff --git a/yarpl/CMakeLists.txt b/yarpl/CMakeLists.txt
+index f4159b82..bfa217ed 100644
+--- a/yarpl/CMakeLists.txt
++++ b/yarpl/CMakeLists.txt
+@@ -56,6 +56,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
+ find_package(Gflags REQUIRED)
+ find_package(Glog REQUIRED)
+ find_package(fmt CONFIG REQUIRED)
++find_package(ZLIB CONFIG REQUIRED)
+
+ IF(NOT FOLLY_VERSION)
+   include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/InstallFolly.cmake)
+@@ -123,7 +124,7 @@ message("yarpl source dir: ${CMAKE_CURRENT_SOURCE_DIR}")
+
+ target_link_libraries(
+   yarpl
+-  PUBLIC Folly::folly glog::glog gflags
++  PUBLIC Folly::folly glog::glog gflags ZLIB::ZLIB
+   INTERFACE ${EXTRA_LINK_FLAGS})
+
+ include(CMakePackageConfigHelpers)
